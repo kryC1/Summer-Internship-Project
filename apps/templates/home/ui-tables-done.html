@@ -1,0 +1,274 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% block title %} UI Tables {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<httpProtocol>
+  <customHeaders id = "customHeaders">
+    <!-- Test this option as Chrome supports CSP now for Iframe opening-->
+  </customHeaders>
+</httpProtocol>
+
+<div class="row">
+
+
+  <div class="col-md-12">
+    <form method="GET" action="" class="form-inline" style="float: right;">{% csrf_token %}
+      <input type="number" name="pg_num" min="1" max="100" placeholder="Item per page (currently {{ ticket_list.paginator.per_page}})" class="form-control mb-2 mr-sm-2">
+      <button type="submit" name="Submit" class="btn btn-primary mb-2">List</button>
+    </form>
+  </div>
+
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Tickets</h2>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive" >
+          <table class="table tablesorter">
+            <thead class=" text-primary">
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Process</th>
+                <th>Date Updated</th>
+                <th>Domain</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <form method="GET" action="" class="form-inline">{% csrf_token %}
+                  <td>
+                    <input type="text" name="filter_name" placeholder="filter by name" class="form-control mb-2 mr-sm-2">
+                  </td>
+                  <td>
+                    <input type="text" name="filter_email" placeholder="filter by email" class="form-control mb-2 mr-sm-2">
+                  </td>
+                  <td>
+                    <select name="filter_subject" class="form-control mb-2 mr-sm-2">
+                      <option value="all" selected>filter by subject</option>
+                      <option value="False Positive">False Positive</option>
+                      <option value="Suggestion & Ideas">Suggestion & Ideas</option>
+                      <option value="Bug Report">Bug Report</option>
+                      <option value="Academic Request">Academic Request</option>
+                      <option value="Other Topics">Other Topics</option>
+                    </select>
+                  </td>
+                  <td></td>
+                  <td>
+                    <select name="filter_process" class="form-control mb-2 mr-sm-2">
+                      <option value="all" selected>filter by process</option>
+                      <option value="1">Cleaned</option>
+                      <option value="2">Rejected</option>
+                    </select>
+                  </td>
+                  <td></td>
+                  <td>
+                    <input type="text" name="filter_domain" placeholder="filter by domain" class="form-control mb-2 mr-sm-2">
+                  </td>
+                  <td>
+                    <button type="submit" name="Submit" class="btn btn-primary col-md-12 mb-2 mr-sm-2">Filter</button>
+                  </td>
+                </form>
+              </tr>
+            </tbody>
+            <tbody id="content">
+              {% for t in ticket_list %}
+                <tr>
+                  <td>{{t.fullname}}</td>
+                  <td>{{t.email}}</td>
+                  <td>{{t.subject}}</td>
+                  <td>{{t.status_flag}}</td>
+                  <td>{{t.operation_flag}}</td>
+                  <td>{{t.date_updated}}</td>
+                  <td>{{t.domain}}</td>
+                  <td class="text-center">
+                  {% if t.status_flag == 2 %}
+                    <button class="btn btn-fill btn-primary" disabled>Change Process</button>
+                  {% else %}
+
+                    <!-- This button will pop up a modal to the user for inspection -->
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong" onclick = "setID('{{t.id}}')">Change Process</button>
+                    <!-- At the same time, it sends the id of the ticket to make server send ticket's data to client side-->
+
+
+                    <!-- This is the script for opening the model -->
+                    <script script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js">
+                      $('#exampleModal').on('show.bs.modal', function(event) {
+                        var button = $(event.relatedTarget) // Button that triggered the modal
+                        var recipient = button.data('whatever') // Extract info from data-* attributes
+                        var modal = $(this)
+                        modal.find('.modal-title').text('New message to ' + recipient)
+                        modal.find('.modal-body input').val(recipient)
+                      })
+                    </script>
+                  {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          
+          <!--Pagination -->
+          <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+              {% if ticket_list.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page=1">&laquo First</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ ticket_list.previous_page_number }}">Previous</a>
+                </li>
+              {% endif %}
+
+              {% for num in ticket_list.paginator.page_range %}
+                {% if ticket_list.number == num %}
+                  <li class="page-item active">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                  </li>
+                {% elif num > ticket_list.number|add:'-4' and num < ticket_list.number|add:'4' %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+
+              {% if ticket_list.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ ticket_list.next_page_number }}">Next</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ ticket_list.paginator.num_pages }}">Last &raquo</a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- This is the body of the modal -->
+
+  <div id="exampleModalLong" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document" >
+          <div class="modal-content" style = "background-color: transparent;">
+ 
+              <div class="modal-body" id = "modal-body">
+
+                      <div >
+                        <div class="col-md-12">
+                          <div class="card">
+                            <div class="card-header" id = "class-header">
+                            </div>
+                            <div class="card-body">
+                              
+                              <!-- Rendering spesific ticket data via JavaScript-->
+                              Scenario : <br>
+                              <p id = "scenario" style = "color: white;"></p>
+                              <div id = "domain"></div>
+                              <img id = "img"></img>
+                              <!-- -------------------------------------------- -->
+
+
+                              <form method = "POST" action=""> {%csrf_token%}
+                              <div class="row">
+                                <div class="form-group">
+                                  <br>
+                                  <label>Operations:</label><br>
+                                  <select name = "op_select" class="form-control" required>
+                                    <option value="" disabled selected>Select your process</option>
+                                    <option value = "0">Send it back to waiting tickets</option>
+                                    <option value = "1">Clean this ticket</option>
+                                    <option value = "2">Reject this ticket</option>
+                                  </select>
+                                  <div id = "ticketID"></div>
+                                </div>
+                                <div class="col-md-3 px-md-1">
+                                
+                                </div>
+                              </div>
+                      
+                              <button type = 'submit' name ='Submit' id = "sbmtBtn" class = 'btn btn-fill btn-primary' action = "{% url 'updateGlobal' %}">Submit</button>
+                              </form>
+                      <br><br>
+                  </div>
+                </div>
+              </div>
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+<script src="https://appsrv1-147a1.kxcdn.com/dattaable-pro/js/vendor-all.min.js"></script>
+<script src="https://appsrv1-147a1.kxcdn.com/dattaable-pro/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://appsrv1-147a1.kxcdn.com/dattaable-pro/js/pcoded.min.js"></script>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+<script>
+
+  function update(){
+    $("#content").load("{% url 'refreshDoneTable' %}" + "#content")
+  }
+  setInterval(update, 2000)
+  var globalID = -1;
+  function setID(id){
+      globalID = id;
+
+
+
+      $.ajax({
+          type : 'POST',
+          url : "{% url 'updateGlobal' %}",
+          data : {'tid' : globalID},
+          success:function() {
+
+          },
+      });
+
+
+      $.ajax({
+        url : "http://127.0.0.1:8000/getTicket/" + id,
+        dataType: 'json',
+        success:function(data){
+          document.getElementById("customHeaders").innerHTML = "<add name='Content-Security-Policy' value='frame-ancestors " +  data.id.domain + "/>"
+          document.getElementById("class-header").innerHTML =  "<h2 class='card-title'> Name : " + data.id.firstname + " " + data.id.lastname + "</h2>" + "<h3 class = 'card-title'> Subject : " + data.id.subject + "</h3>" + "</div>"; 
+          document.getElementById("scenario").innerHTML += data.id.scenario;
+          if(data.id.domain != null){
+            document.getElementById("domain").innerHTML = "<a href = '" + data.id.domain + "' target='_blank'>" + data.id.domain + "</a>";
+          }
+
+          if(data.id.imageName != null){
+            document.getElementById("img").src = "/static/images/" + data.imageName;
+          }
+
+        },
+      });
+      
+
+  }   
+  </script>
+
+{% endblock javascripts %}
