@@ -1,0 +1,81 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Register {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+        <div class="row">
+          <div class="col-md-8" >
+            <div class="card" style="background-color:transparent;">
+              {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-dismissible alert-success" >
+              <button type="button" class="close" data-dismiss="alert">
+              ×
+              </button>
+              <strong>{{message}}</strong>
+            </div>
+         {% endfor %}
+        {% endif %}
+
+              <form role="form" method="POST" action="">{% csrf_token %}
+              
+                <div class="card-header" >
+                  <h5 class="title">Create a New Ticket</h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+                      <div class="col-md-3 px-md-1">
+                        <div class="form-group">
+                          <label>Username:</label>
+                          <input class="form-control" id="username_create" name="username" type="text" value="{{ request.user.username }}" disabled>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-3 px-md-1">
+                        <div class="form-group">
+                          <label>Subjects:</label><br>
+                          <select name="sub_select" required="" class="form-control">
+                            <option value="" disabled selected hidden>Select Here</option>
+                            <option value="False Positive">False Positive</option>
+                            <option value="Suggestion & Ideas">Suggestion & Ideas</option>
+                            <option value="Bug Report">Bug Report</option>
+                            <option value="Academic Request">Academic Request</option>
+                            <option value="Other Topics">Other Topics</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    
+                        <div class="form-group">
+                          <label>Scenario:</label>
+                          <textarea name="scnr" required="" class="form-control" id="message" rows="4"></textarea>
+                        </div>
+                   
+                    
+                </div>
+                <div class="card-footer">
+                  <button type="submit" name="Submit" class="btn btn-fill btn-primary">Submit</button>
+                  &nbsp; &nbsp;
+                  <button class="btn btn-fill btn-primary" onclick="window.location.href='{% url 'home' %}'">Cancel</button>
+                </div>
+
+              </form>
+
+            </div>
+          </div>
+      </div>
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
