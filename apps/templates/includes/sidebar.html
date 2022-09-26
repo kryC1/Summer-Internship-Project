@@ -1,0 +1,134 @@
+
+
+    <div class="sidebar">
+      <div class="sidebar-wrapper">
+        <div class="logo">
+          <img src="https://i.ibb.co/KbtxWR7/logo20.png">
+        </div>
+
+        <ul class="nav">
+        {% if request.user.is_authenticated %}
+
+          <li class="{% if 'index' in segment %} active {% endif %}">
+            <a href="/">
+              <i class="tim-icons icon-components"></i>
+              <p>Home</p>
+            </a>
+          </li>
+          <li class="{% if 'page-user' in segment %} active {% endif %}">
+            <a href="/page-user.html">
+              <i class="tim-icons icon-single-02"></i>
+              <p>User Profile</p>
+            </a>
+          </li>
+          <li class="{% if 'tables' in segment %} active {% endif %}">
+            <a data-toggle="modal" data-target="#exampleModalLive">
+              <i class="tim-icons icon-simple-add"></i>
+              <p>Create Ticket</p>
+            </a>
+          </li>
+          <li class="{% if 'tables' in segment %} active {% endif %}">
+
+            <a href="#homeSubmenu2" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+              <i class="tim-icons icon-bullet-list-67"></i>
+              <p>Table List</p>
+            </a>
+
+            <ul class="collapse list-unstyled" id="homeSubmenu2">
+              <li>
+                <a href="{% url 'getWaitingTickets' %}">Waiting</a>
+              </li>
+
+              <li>
+                <a href="{% url 'getDoneTickets' %}">Closed</a>
+              </li>
+            </ul>
+
+          </li>
+          {% if request.user.is_superuser %}
+          <li class="{% if 'tables' in segment %} active {% endif %}">
+
+            <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+              <i class="tim-icons icon-shape-star"></i>
+              <p>Admin</p>
+            </a>
+
+            <ul class="collapse list-unstyled" id="homeSubmenu">
+              <li>
+                <a href="http://127.0.0.1:8000/admin">Admin Panel</a>
+              </li>
+
+              <li>
+                <a href="http://127.0.0.1:8000/adminDashboard/">Dashboard</a>
+              </li>
+            </ul>
+
+          </li>
+          {% endif %}  
+          <li>
+            <a href="{% url 'logout' %}" >
+              <i class="tim-icons icon-button-power"></i>
+              <p>Logout</p>
+            </a>
+          </li>  
+          {% endif %}
+                    
+        </ul>
+
+        <ul class="nav">
+          
+        </ul>
+        
+      </div>
+    </div>
+
+<!--MODAL START (CREATE TICKET)-->
+<div id="exampleModalLive" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="exampleModalLiveLabel" aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.6);">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" style="background-color: rgba(0, 0, 0, 0 );">
+      
+      <div class="card">
+        <form role="form" method="POST" action="{% url 'create' %}">{% csrf_token %}
+          <div class="card-body">
+              <div class="row">
+                <div class="col-md-6 px-md-1">
+                  <div class="form-group">
+                    <label>Username:</label>
+                    <input class="form-control" id="username_create" name="username" type="text" value="{{ request.user.username }}" disabled>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 px-md-1">
+                  <div class="form-group">
+                    <label>Subjects:</label><br>
+                    <select name="sub_select" required="" class="form-control">
+                      <option value="" disabled selected hidden>Select Here</option>
+                      <option value="False Positive">False Positive</option>
+                      <option value="Suggestion & Ideas">Suggestion & Ideas</option>
+                      <option value="Bug Report">Bug Report</option>
+                      <option value="Academic Request">Academic Request</option>
+                      <option value="Other Topics">Other Topics</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Scenario:</label>
+                <textarea name="scnr" required="" class="form-control" id="message" rows="10" placeholder="(max 2000 chararacter)" maxlength="2000"></textarea>
+              </div>
+          </div>
+          <div class="card-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" name="Submit" class="btn btn-fill btn-primary" style="float: right;">Submit</button>
+            &nbsp; &nbsp;
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!--MODAL END (CREATE TICKET)-->
+
+
